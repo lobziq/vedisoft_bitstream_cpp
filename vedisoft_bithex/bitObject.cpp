@@ -7,9 +7,17 @@ bitObject::bitObject(int type, std::string data)
 	generateValue();
 }
 
-bool bitObject::isValidPacket(std::string data)
+int bitObject::isValidPacket(std::string data)
 {
-	std::string packet = data.substr(8, data.length() - 16);
+	//int = error code
+	//0 = IS FINE
+	//1 = repeating 1 symbols
+	//2 = not divisible by 8
+	//3 = length > 8000
+	std::string packet = data;//.substr(8, data.length() - 16);
+
+	//std::cout << "Packet is:" << packet << std::endl;
+
 	std::string finalPacket;
 	std::stringstream ss;
 	short counter = 0;
@@ -20,8 +28,8 @@ bool bitObject::isValidPacket(std::string data)
 		{
 			if (packet.at(i) == '1')
 			{
-				std::cout << "Uncorrect packet: " << packet << "\nIDX: " << i << ", " << packet.at(i) << std::endl;
-				return false;
+				//std::cout << "Uncorrect packet: " << packet << "\nIDX: " << i << ", " << packet.at(i) << std::endl;
+				return 1;
 			}
 			counter = 0;
 		}
@@ -39,15 +47,15 @@ bool bitObject::isValidPacket(std::string data)
 	if ((float)finalPacket.length() / 8 != (int)finalPacket.length() / 8)
 	{
 		std::cout << "Packet is bad (isnt divisible by 8), length is " << finalPacket.length() << std::endl;
-		return false;
+		return 2;
 	}
 	if (finalPacket.length() > 8000)
 	{
 		std::cout << "Packet is too big" << std::endl;
-		return false;
+		return 3;
 	}
 
-	return true;
+	return 0;
 }
 
 void bitObject::createType1Value()

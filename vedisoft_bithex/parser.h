@@ -15,11 +15,16 @@ public:
 	void parseString(std::string input, unsigned int maxLength);
 	void invertString(std::string* s);
 
+	void transferIsOver();
+
 	std::string getParsed();
 
 	~parser();
 
 private:
+	bool lastChance = false;
+	unsigned int limit;
+
 	std::string leftOver;
 	std::string inputString;
 	std::string binaryString;

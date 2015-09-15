@@ -11,7 +11,7 @@ public:
 
 	std::string getValue();
 
-	static bool isValidPacket(std::string data);
+	static int isValidPacket(std::string data);
 
 	~bitObject();
 

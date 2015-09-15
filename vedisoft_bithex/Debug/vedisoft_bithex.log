@@ -1,11 +1,11 @@
-﻿Build started 13.09.2015 9:14:49.
+﻿Build started 15.09.2015 6:53:36.
      1>Project "C:\develop\test\vedisoft_bithex\vedisoft_bithex\vedisoft_bithex.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt bitObject.cpp
-         bitObject.cpp
-     1>c:\develop\test\vedisoft_bithex\vedisoft_bithex\bitobject.cpp(17): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\develop\test\vedisoft_bithex\vedisoft_bithex\bitobject.cpp(75): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\develop\test\vedisoft_bithex\vedisoft_bithex\bitobject.cpp(101): warning C4018: '<' : signed/unsigned mismatch
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt parser.cpp
+         parser.cpp
+     1>c:\develop\test\vedisoft_bithex\vedisoft_bithex\parser.cpp(46): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\develop\test\vedisoft_bithex\vedisoft_bithex\parser.cpp(105): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\develop\test\vedisoft_bithex\vedisoft_bithex\parser.cpp(271): warning C4018: '<' : signed/unsigned mismatch
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\develop\test\vedisoft_bithex\Debug\vedisoft_bithex.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\develop\test\vedisoft_bithex\Debug\vedisoft_bithex.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\develop\test\vedisoft_bithex\Debug\vedisoft_bithex.lib" /MACHINE:X86 Debug\bitObject.obj
          Debug\converter.obj
@@ -16,4 +16,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.53
+Time Elapsed 00:00:00.56

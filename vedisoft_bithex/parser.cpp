@@ -3,6 +3,8 @@
 parser::parser()
 {
 	//
+	limit = 65535;
+	lastChance = false;
 }
 
 void parser::invertString(std::string* s)
@@ -15,6 +17,11 @@ void parser::invertString(std::string* s)
 	*s = temp;
 }
 
+void parser::transferIsOver()
+{
+	lastChance = true;
+}
+
 bool parser::prepareString(std::string input, unsigned int maxLength)
 {
 	this->inputString = input;
@@ -23,7 +30,7 @@ bool parser::prepareString(std::string input, unsigned int maxLength)
 	//checking for all string conditions, converting hex to binary + swapping byte contents
 	if (inputString.length() > maxLength)
 	{
-		std::cerr << "Incorrect input string size (more than 300 bytes)" << std::endl;
+		std::cerr << "Incorrect input string size (more than " << maxLength << " bytes)" << std::endl;
 		return false;
 	}
 	if (inputString.length() == 0)
@@ -31,20 +38,27 @@ bool parser::prepareString(std::string input, unsigned int maxLength)
 		std::cerr << "Input string is empty" << std::endl;
 		return false;
 	} 
+	if ((float)inputString.length() / 2 != (int)inputString.length() / 2)
+	{
+		std::cerr << "Input string contains number of bits not divisible by 8" << std::endl;
+		return false;
+	}
+
 	for (int i = 0; i < inputString.length(); i+=2)
 	{
 		std::string s;
-		s += converter::hexToBinary(inputString.at(i));
-		s += converter::hexToBinary(inputString.at(i + 1));
-		if (s == "INCORRECT HEX VALUE")
+		if (converter::hexToBinary(inputString.at(i)) != "INCORRECT HEX VALUE"
+			&& converter::hexToBinary(inputString.at(i + 1)) != "INCORRECT HEX VALUE")
 		{
-			std::cerr << "Incorrect symbols in string" << std::endl;
-			return false;
+			s += converter::hexToBinary(inputString.at(i));
+			s += converter::hexToBinary(inputString.at(i + 1));
+			invertString(&s);
+			binaryString += s;
 		}
 		else
 		{
-			invertString(&s);
-			binaryString += s;
+			std::cerr << "Incorrect symbols in string" << std::endl;
+			return false;
 		}
 	}
 
@@ -56,12 +70,15 @@ void parser::parseString(std::string input, unsigned int maxLength)
 {
 	objects.clear();
 	
-	std::cout << "Input string: " << input << std::endl;
-
-	if (!prepareString(input, maxLength)) return;
-
+	//debug std::cout << "Input string: " << input << std::endl;
+	
+	if (!lastChance)
+	{
+		if (!prepareString(input, maxLength)) return;
+	}
+	
 	binaryString = leftOver + binaryString;
-	std::cout << "Input binary string: " << binaryString << std::endl;
+	//debug std::cout << "Input binary string: " << binaryString << std::endl;
 
 	leftOver.clear();
 
@@ -76,6 +93,8 @@ void parser::parseString(std::string input, unsigned int maxLength)
 		
 		if (checker == "11111111")
 		{
+			std::cout << "parsing 1111 etc\n";
+
 			if (garbage.length() > 0)
 			{
 				objects.push_back(bitObject(4, garbage));
@@ -86,18 +105,34 @@ void parser::parseString(std::string input, unsigned int maxLength)
 			int oneCounter = 8;
 			for (int i = 8; i < binaryString.length(); i++)
 			{
-				if (i == binaryString.length() - 1)
+				if (i == (limit - 1)) //i is index so -1
 				{
-					//leftOver += binaryString;
-					//binaryString.clear();
+					//max length - converting into object
 					buffer += binaryString[i];
 					objects.push_back(bitObject(1, buffer));
+					binaryString = binaryString.substr(buffer.length(), binaryString.length() - buffer.length());
+					break;
+				}
+				if (i == binaryString.length() - 1)
+				{
+					//End of string, if there is no more incoming data from user, creating object, else saving this for next input
+					buffer += binaryString[i];
+
+					if (lastChance)
+					{
+						objects.push_back(bitObject(1, buffer));
+					}
+					else
+					{
+						leftOver = buffer;
+					}					
 
 					binaryString.clear();
 					break;
 				}
 				if (binaryString[i] != '1')
 				{
+					//end of streak, creating object
 					objects.push_back(bitObject(1, buffer));
 					binaryString = binaryString.substr(buffer.length(), binaryString.length() - buffer.length());
 					break;
@@ -109,71 +144,118 @@ void parser::parseString(std::string input, unsigned int maxLength)
 		else if (checker == "01111110")
 		{
 			int counter = 1;
-			int anchor = 8;
+			long anchor = 8;
 			if (garbage.length() > 0)
 			{
 				objects.push_back(bitObject(4, garbage));
 				garbage.clear();
 			}
 
+			//trying to find next occurence of 0111111110 byte (element) !!
+			//our anchor is at the end of first element
 			std::size_t index = binaryString.find("01111110", anchor);
-			//binaryString = binaryString.substr(8, binaryString.length() - 8);
-			//std::cout << "Index is: " << index << std::endl;
 
 			while (index == anchor)
 			{
-				//std::cout << "Index is: " << index << std::endl;
-				if (index != std::string::npos)
-				{
-					if (index == anchor)
-					{
-						counter++;
-						anchor += 8;
-					}
-				}
-				index = binaryString.find("01111110", anchor);
+				//streak of elements
+				//adding counter keeping this in memory
+				counter++;
+				anchor += 8;
+
+				index = binaryString.find("01111110", anchor);			
 			} 
 
-			std::string s = binaryString.substr(anchor - 8, index - (anchor - 16));
-			//std::cout << "Packet string: " << s << std::endl;
+			if (counter >= limit)
+			{
+				//maximum length, creating object
+				objects.push_back(bitObject(2, binaryString.substr(0, anchor)));
+				binaryString = binaryString.substr(anchor, binaryString.length() - anchor);
+				break;
+			}
+
+			//streak is over, but we got last index of next element if its exists
+			//if element isnt exists, we are just taking all our streak of elements into 2nd type object,
+			//and all data past last element we dont need to parse now
+			
+			//taking all the data between last 2 elements (suspecting its our packet)
+			std::string packet = binaryString.substr(anchor, index - anchor);
+
 			if (index != std::string::npos)
 			{
-				if (bitObject::isValidPacket(s))
-				{
-					objects.push_back(bitObject(2, binaryString.substr(0, anchor - 8)));
-					//binaryString = binaryString.substr(anchor - 8, binaryString.length() - anchor + 8);
-					objects.push_back(bitObject(3, s));
+				if (bitObject::isValidPacket(packet) == 0)
+				{	
+					//we checked our data, its legit packet
+					//our 2 last elements is the boundaries of packet, but the previously elements (if exists) is 2nd type object
+					//so we just substracting this from string and converting
+					//also cutting string to repeat from beginning
+					if (counter > 1)
+					{
+						objects.push_back(bitObject(2, binaryString.substr(0, anchor - 8)));
+					}
+					objects.push_back(bitObject(3, binaryString.substr(anchor - 8, index - (anchor - 16))));
 					binaryString = binaryString.substr(index + 8, binaryString.length() - index);
 
-					std::cout << binaryString << std::endl;
+					//std::cout << binaryString << std::endl; // heheh just cheking
 				}
 				else
 				{
-					objects.push_back(bitObject(2, binaryString.substr(0, anchor + 8)));
-					binaryString = binaryString.substr(anchor + 8, binaryString.length() - (anchor + 8));
+					//so it isnt legit packet, then our elements before it going into 2nd object
+					//also cutting string to repeat
+
+					objects.push_back(bitObject(2, binaryString.substr(0, anchor)));
+					binaryString = binaryString.substr(anchor, binaryString.length() - (anchor));
 				}
 			}
 			else
 			{
-				std::string s = binaryString.substr(0, anchor);
-				binaryString = binaryString.substr(anchor, binaryString.length() - anchor);
-				objects.push_back(bitObject(2, s));
+				//we didnt find our next element
+				if (lastChance)
+				{
+					std::string s = binaryString.substr(0, anchor);
+					binaryString = binaryString.substr(anchor, binaryString.length() - anchor);
+					objects.push_back(bitObject(2, s));	
+				}
+				else
+				{
+					std::string packet = binaryString.substr(anchor, binaryString.length() - anchor);
+					if (bitObject::isValidPacket(packet) != 1)
+					{
+						//this can be legit packet later if we find boundary condition (0111111110) later
+						leftOver = binaryString;
+						binaryString.clear();
+					}
+					else
+					{
+						//else just converting our streak of elements into 2nd object and cutting string from then
+						std::string s = binaryString.substr(0, anchor);
+						binaryString = binaryString.substr(anchor, binaryString.length() - anchor);
+						objects.push_back(bitObject(2, s));
+					}
+				}
 			}
 		}
 		else if (binaryString.length() == 8)
 		{
-			//leftOver.clear();
-			//leftOver = garbage;
-			//leftOver += binaryString;
+			//smells like garbage...
+			//are we suppose to convert it right now? MBY possible to left this and parse with next packet
 			garbage += binaryString;
 
-			objects.push_back(bitObject(4, garbage));
+			if (lastChance)
+			{
+				objects.push_back(bitObject(4, garbage));
+			}
+			else
+			{
+				leftOver = garbage;
+			}
 
 			binaryString.clear();
 			garbage.clear();
 		}
 		else
 		{
+			//more than 8 bits isnt converting, but dont seems we could find some actual data
+			//taking our next symbol into garbage to convert it later and keep going from now
 			garbage += binaryString[0];
 			binaryString.erase(0, 1);
 		}
@@ -188,12 +270,17 @@ void parser::parseString(std::string input, unsigned int maxLength)
 std::string parser::getParsed()
 {
 	std::string r;
+	
 	for (int i = 0; i < objects.size(); i++)
 	{
-		r += "\nBinary data: " + objects[i].data;
-		r += "\nHex data: " + objects[i].getValue();
-		r += " ";
+		//more info :)
+		//r += "\nBinary data: " + objects[i].data;
+		//r += "\nHex data: " + objects[i].getValue();
+		//r += " ";
+
+		r += objects[i].getValue();
 	}
+
 	return r;
 }
 
