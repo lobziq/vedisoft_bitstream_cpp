@@ -93,7 +93,7 @@ void parser::parseString(std::string input, unsigned int maxLength)
 		
 		if (checker == "11111111")
 		{
-			std::cout << "parsing 1111 etc\n";
+			//std::cout << "parsing 1111 etc\n";
 
 			if (garbage.length() > 0)
 			{
@@ -264,7 +264,7 @@ void parser::parseString(std::string input, unsigned int maxLength)
 
 	//leftOver.clear();
 	//leftOver = binaryString;
-	std::cout << "Leftover: " << leftOver << std::endl;
+	//std::cout << "Leftover: " << leftOver << std::endl;
 }
 
 std::string parser::getParsed()
