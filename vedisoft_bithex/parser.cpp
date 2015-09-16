@@ -223,7 +223,7 @@ void parser::parseString(std::string input, unsigned int maxLength)
 				else
 				{
 					std::string packet = binaryString.substr(anchor, binaryString.length() - anchor);
-					if (bitObject::isValidPacket(packet) != 1)
+					if (bitObject::isValidPacket(packet) != 1 && bitObject::isValidPacket(packet) != 3)
 					{
 						//this can be legit packet later if we find boundary condition (0111111110) later
 						leftOver = binaryString;
@@ -245,14 +245,8 @@ void parser::parseString(std::string input, unsigned int maxLength)
 			//are we suppose to convert it right now? MBY possible to left this and parse with next packet
 			garbage += binaryString;
 
-			if (lastChance)
-			{
-				objects.push_back(bitObject(4, garbage));
-			}
-			else
-			{
-				leftOver = garbage;
-			}
+			objects.push_back(bitObject(4, garbage));
+			//if we are gonna left this// leftOver = garbage;
 
 			binaryString.clear();
 			garbage.clear();

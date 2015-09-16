@@ -46,12 +46,12 @@ int bitObject::isValidPacket(std::string data)
 
 	if ((float)finalPacket.length() / 8 != (int)finalPacket.length() / 8)
 	{
-		std::cout << "Packet is bad (isnt divisible by 8), length is " << finalPacket.length() << std::endl;
+		//std::cout << "Packet is bad (isnt divisible by 8), length is " << finalPacket.length() << std::endl;
 		return 2;
 	}
 	if (finalPacket.length() > 8000)
 	{
-		std::cout << "Packet is too big" << std::endl;
+		//std::cout << "Packet is too big" << std::endl;
 		return 3;
 	}
 
