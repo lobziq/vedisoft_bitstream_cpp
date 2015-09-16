@@ -14,24 +14,8 @@ int main()
 	std::string s;
 	parser p;
 
-	p.parseString("7EA1", maxLength);
-
-	std::string f;
-	for (int i = 0; i < 8000; i++)
-	{
-		f += "1";
-	}
-	bitObject b = bitObject(4, f);
-	std::cout << b.getValue() << std::endl;
-
 	while (std::getline(std::cin, s))
 	{
-		
-
-		
-		
-		s = "A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1";
-		std::cout << s << std::endl;
 		p.parseString(s, maxLength);
 
 		std::cout << p.getParsed() << std::endl;
@@ -41,7 +25,7 @@ int main()
 	p.parseString("", maxLength);
 	std::cout << p.getParsed() << std::endl;
 
-	//p.parseString()
+	std::getchar();
 
 	return 0;
 }
