@@ -6,6 +6,7 @@
 #include "bitObject.h"
 #include "converter.h"
 
+
 class parser
 {
 public:

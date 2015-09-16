@@ -10,7 +10,7 @@
 
 int main()
 {
-	const int maxLength = 300; //300 bytes is 600 hex symbols as one stands for 0.5 byte
+	const int maxLength = 600; //300 bytes is 600 hex symbols as one stands for 0.5 byte
 	std::string s;
 	parser p;
 
