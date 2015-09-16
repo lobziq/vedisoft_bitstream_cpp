@@ -118,14 +118,9 @@ void parser::parseString(std::string input, unsigned int maxLength)
 					//End of string, if there is no more incoming data from user, creating object, else saving this for next input
 					buffer += binaryString[i];
 
-					if (lastChance)
-					{
-						objects.push_back(bitObject(1, buffer));
-					}
-					else
-					{
-						leftOver = buffer;
-					}					
+
+					objects.push_back(bitObject(1, buffer));
+					//for future lastChance impelemtation, if needed // leftOver = buffer;	
 
 					binaryString.clear();
 					break;
@@ -162,8 +157,10 @@ void parser::parseString(std::string input, unsigned int maxLength)
 				counter++;
 				anchor += 8;
 
-				index = binaryString.find("01111110", anchor);			
-			} 
+				index = binaryString.find("01111110", anchor);	
+
+				if (counter >= limit) break;
+			}
 
 			if (counter >= limit)
 			{
@@ -172,6 +169,14 @@ void parser::parseString(std::string input, unsigned int maxLength)
 				binaryString = binaryString.substr(anchor, binaryString.length() - anchor);
 				break;
 			}
+
+			if (anchor == binaryString.length())
+			{
+				std::string s = binaryString.substr(0, anchor);
+				binaryString = binaryString.substr(anchor, binaryString.length() - anchor);
+				objects.push_back(bitObject(2, s));
+				break;
+			}		
 
 			//streak is over, but we got last index of next element if its exists
 			//if element isnt exists, we are just taking all our streak of elements into 2nd type object,
