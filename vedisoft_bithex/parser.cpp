@@ -1,5 +1,7 @@
 #include "parser.h"
 
+#include <algorithm>
+
 parser::parser()
 {
 	//
@@ -47,12 +49,21 @@ bool parser::prepareString(std::string input, unsigned int maxLength)
 	for (int i = 0; i < inputString.length(); i+=2)
 	{
 		std::string s;
-		if (converter::hexToBinary(inputString.at(i)) != "INCORRECT HEX VALUE"
-			&& converter::hexToBinary(inputString.at(i + 1)) != "INCORRECT HEX VALUE")
+		//std::string binary1 = converter::hexToBinary(inputString.at(i));
+		//std::string binary2 = converter::hexToBinary(inputString.at(i + 1));
+
+		//for optimization purposed, we initially converting for reverse bit array
+		std::string binary1 = converter::hexToReversedBinary(inputString.at(i));
+		std::string binary2 = converter::hexToReversedBinary(inputString.at(i + 1));
+		if (binary1 != "INCORRECT HEX VALUE" && binary2 != "INCORRECT HEX VALUE")
 		{
-			s += converter::hexToBinary(inputString.at(i));
-			s += converter::hexToBinary(inputString.at(i + 1));
-			invertString(&s);
+			s += binary2;
+			s += binary1;
+
+			//more slow, but logical approach
+			//s += binary1;
+			//s += binary2;
+			//std::reverse(s.begin(), s.end());
 			binaryString += s;
 		}
 		else
@@ -99,6 +110,12 @@ void parser::parseString(std::string input, unsigned int maxLength)
 			{
 				objects.push_back(bitObject(4, garbage));
 				garbage.clear();
+			}
+
+			if (checker == binaryString)
+			{
+				objects.push_back(bitObject(1, checker));
+				binaryString.clear();
 			}
 
 			buffer = checker;

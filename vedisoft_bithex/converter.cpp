@@ -6,9 +6,9 @@ converter::converter()
 	
 }
 
-std::string converter::binaryToHex(std::string byte)
+std::string converter::binaryToHex(std::string binary)
 {
-	if (byte.length() != 4)
+	if (binary.length() != 4)
 	{
 		//std::cout << "incorrect byte value (length != 4)" << std::endl;
 		return "INCORRECT DATA LENGTH (NOT EQUAL 4)";
@@ -33,17 +33,97 @@ std::string converter::binaryToHex(std::string byte)
 	m["1110"] = "E";
 	m["1111"] = "F";
 
-	if (m[byte] == "")
+	if (m[binary] == "")
 	{
 		//std::cout << "Incorrect byte value" << std::endl;
-		return "INCORRECT BYTE VALUE";
+		return "INCORRECT BINARY VALUE";
 	}
 
-	return m[byte];
+	return m[binary];
+}
+
+std::string converter::hexToReversedBinary(char hex)
+{
+	switch (hex)
+	{
+	case '0':
+		return "0000";
+	case '1':
+		return "1000";
+	case '2':
+		return "0100";
+	case '3':
+		return "1100";
+	case '4':
+		return "0010";
+	case '5':
+		return "1010";
+	case '6':
+		return "0110";
+	case '7':
+		return "1110";
+	case '8':
+		return "0001";
+	case '9':
+		return "1001";
+	case 'A':
+		return "0101";
+	case 'B':
+		return "1101";
+	case 'C':
+		return "0011";
+	case 'D':
+		return "1011";
+	case 'E':
+		return "0111";
+	case 'F':
+		return "1111";
+	default:
+		return "INCORRECT HEX VALUE";
+	}
 }
 
 std::string converter::hexToBinary(char hex)
 {
+	switch (hex)
+	{
+		case '0':
+			return "0000";
+		case '1':
+			return "0001";
+		case '2':
+			return "0010";
+		case '3':
+			return "0011";
+		case '4':
+			return "0100";
+		case '5':
+			return "0101";
+		case '6':
+			return "0110";
+		case '7':
+			return "0111";
+		case '8':
+			return "1000";
+		case '9':
+			return "1001";
+		case 'A':
+			return "1010";
+		case 'B':
+			return "1011";
+		case 'C':
+			return "1100";
+		case 'D':
+			return "1101";
+		case 'E':
+			return "1110";
+		case 'F':
+			return "1111";
+		default:
+			return "INCORRECT HEX VALUE";
+	}
+
+	/*old implementation, suddenly impossibru slow
 	std::map <char, std::string> m;
 
 	m['0'] = "0000";
@@ -69,7 +149,7 @@ std::string converter::hexToBinary(char hex)
 		return "INCORRECT HEX VALUE";
 	}
 
-	return m[hex];
+	return m[hex]; */
 }
 
 std::string converter::decimalToHex(unsigned short dec)
